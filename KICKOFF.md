@@ -43,7 +43,7 @@
 
 ## 4. 文書を実測で直す
 
-`docs/sources.md` の「要確認」「推測」の行のうち、手順2〜3で確かめたもの（使われたモデル名、1問あたりの費用など）を「生データで確認」に書き換える。「公開リポジトリでは実行ログを誰でも読める」の行は、`curl -s -o /dev/null -w "%{http_code}" https://github.com/orbiane/forecast-lab/actions/runs/<run_id>` が（ログインなしで）200を返すかで確かめる。`setup/first-run` に commit して push する。
+`docs/sources.md` の「要確認」「推測」の行のうち、手順2〜3で確かめたもの（使われたモデル名、1問あたりの費用など）を「生データで確認」に書き換える。`setup/first-run` に commit して push する。
 
 成功の条件: `git diff main..setup/first-run -- docs/sources.md` に、書き換えた行と根拠（どの実行のどのログか）が出る。
 

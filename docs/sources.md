@@ -57,7 +57,7 @@
 | 見本の定時実行は20分おき（このリポジトリも20分おき。ADR-002） | 生データで確認 | 見本の `run_bot_on_tournament.yaml` |
 | 公開リポジトリでは、60日間リポジトリに動きがないと定時実行が自動で止まる。通知はない | 公式＋観察 | GitHub Docs「Usage limits, billing, and administration」、cronuru のガイド |
 | `GITHUB_TOKEN` での push が60日ルールの「動き」に数えられるか | 要確認 | keepalive の初回の後、定時実行の状態を見る |
-| 公開リポジトリでは Actions の実行ログを誰でも読める | 要確認 | クラウド側の Claude の理解。公開後に、ログインしていないブラウザで実行ページを開いて確かめる |
+| 公開リポジトリでは Actions の実行履歴とログを誰でも読める | 公式 | GitHub の公開切り替え画面の注意書き「Actions history and logs will be visible to everyone」（2026-11-17） |
 | 見本の `log_report_summary` は、問題ごとに要約と理由の全文（最大1万字）をログに出す。費用の見積もり（合計と1問あたり）も出す | 生データで確認 | forecasting-tools 0.3.7 `forecast_bot.py` 787行目〜 |
 | 見本の `main.py` は、調査内容・理由・予測値を INFO ログに出す | 生データで確認 | `main.py` の `logger.info(f"Reasoning for URL ...")` など |
 | クラウド側の Claude の作業環境から metaculus.com には届かない（プロキシが403） | 生データで確認 | 2026-11-17 の curl |
