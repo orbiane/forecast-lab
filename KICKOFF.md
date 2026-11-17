@@ -9,6 +9,7 @@
 1. `orbiane/forecast-lab` を `~/forecast-lab` にクローンする（あれば `main` を pull する）
 2. `CLAUDE.md`、`SETUP.md`、`docs/sources.md`、`docs/decisions/` の ADR-001 と ADR-002 を読む。食い違いや足りない点があれば、作業の前に指摘する（直すかは持ち主が決める）
 3. 文書を直すための作業ブランチ `setup/first-run` を `main` から作る
+4. このリポジトリは公開なので、コミットに持ち主の本物のメールアドレスが載らないようにする。`gh api user --jq '"\(.id)+\(.login)@users.noreply.github.com"'` で GitHub の noreply アドレスを作り、`~/forecast-lab` の中だけで `git config --local user.email <そのアドレス>` を設定する。`git var GIT_AUTHOR_IDENT` の出力に noreply アドレスが出ることを示す（出力にほかのメールアドレスが出たら、それを報告に書き写さない）
 
 今回の範囲は、試運転（Test Bot）の成功を示し、本番開始の可否を持ち主に聞くところまで。**`main.py` などボットの中身は変えない。`main` には push しない。マージしない。** 持ち主はふだん画面操作しかしないので、持ち主に頼む作業は、ブラウザのどこを押すかで説明する。
 

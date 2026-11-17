@@ -46,7 +46,12 @@
 
 ## コミットのメールアドレスを隠す（公開リポジトリなので）
 
-GitHub の右上のアイコン → `Settings` → 左の `Emails` → `Keep my email addresses private` に印を付ける。Mac で Claude Code がコミットするときに、本物のメールアドレスが公開の履歴に残らないようにするため。
+GitHub の右上のアイコン → `Settings` → 左の `Emails` で、次の2つに印を付ける。
+
+- `Keep my email addresses private` … GitHub の画面上の操作で、本物のアドレスを出さない
+- `Block command line pushes that expose my email` … Mac から本物のアドレスが載ったコミットを push しようとしたら、GitHub が止める（安全網）
+
+Mac の Claude Code 側では、このリポジトリのコミットに noreply アドレスを使うよう設定させる（`KICKOFF.md` の手順0）。
 
 ## 止め方
 
