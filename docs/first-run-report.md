@@ -24,6 +24,10 @@ $ gh secret list -R orbiane/forecast-lab
 （出力なし。exit=0）
 $ gh variable list -R orbiane/forecast-lab
 （出力なし。exit=0。BOT_ENABLED も未設定＝本番は止まっている）
+$ gh api repos/orbiane/forecast-lab/actions/secrets --jq .total_count
+0
+$ gh api repos/orbiane/forecast-lab/actions/variables --jq .total_count
+0
 ```
 
 `gh auth status` は `orbiane` でログイン済みなので、権限の問題ではなく、Secrets がまだ無いと判断した。
@@ -51,6 +55,9 @@ $ gh variable list -R orbiane/forecast-lab
    - 実際に使われたモデルは試運転のログ（`is being served by provider` の行。0.3.5 の `general_llm.py` 426行目が出す）で確かめる。`docs/sources.md` の該当行はまだ書き換えていない（KICKOFF の手順4は、試運転で確かめたものだけを書き換える決まりのため）
    - これが本当なら、`docs/sources.md` の費用の推測（Opus 5.5 の価格で1問約0.4ドル）は前提が違う。モデルの選択は設計判断なので、持ち主に決めてもらう（下の「決めてほしいこと」）
 2. **ログの検査語の出どころ。** KICKOFF の grep 対象のうち、`Reasoning for URL`・`with prediction`・`Found Research` は `main.py` の `logger.info`（`HIDE_FORECASTS_IN_LOGS=true` で止まる）、`First Rationale` は 0.3.5 の `log_report_summary`（811行目。隠す設定のときは呼ばれない）。`Total cost estimated` は `bot_helpers.py` 182行目、`Bot submitted` は `bot_helpers.py` 125行目の表示から出る。なので「0件」は意味のある検査になる。ただし `main.py` が止めるのは自分のロガーだけで、`forecasting_tools` や `litellm` のロガーは INFO のまま。ここから LLM の出力が漏れないかは、実際のログで確かめる（ADR-002 の「まだ怪しい点」と同じ）
+
+3. `uv lock --check` は通った（`Resolved 115 packages`、エラーなし）。Actions の `uv sync --locked` は 0.3.5 を入れるはずで、上の1の見立てと合う。インストールで試運転が失敗する心配は小さい
+4. 指示書に無い判断: 作業ブランチの push 後に Pull Request は作らなかった。KICKOFF が外向きの操作として許しているのは `setup/first-run` への push だけで、持ち主のレビューは `git diff main..setup/first-run` で足りるため。コミットの作者名は GitHub のログイン名のままで、個人名は載っていないことを確かめた
 
 ## まだ怪しい点
 
