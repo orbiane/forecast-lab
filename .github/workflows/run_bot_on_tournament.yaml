@@ -3,7 +3,7 @@ name: Forecast on new AI tournament questions
 on:
   workflow_dispatch:
   schedule:
-    - cron: "23 * * * *" # 毎時23分（UTC）。非公開リポジトリの無料枠（月2,000分）に収めるため、見本の20分おきから下げた。docs/decisions/ADR-001 参照
+    - cron: "7,27,47 * * * *" # 20分おき（UTC）。受付が1〜1.5時間しかない問題を逃さないため。docs/decisions/ADR-002 参照
 
 # Add concurrency group to prevent parallel runs
 concurrency:
@@ -36,6 +36,7 @@ jobs:
         # this reads the environment variables from the github repository.
         # Store under Settings --> Secrets and variables --> Actions
         env:
+          HIDE_FORECASTS_IN_LOGS: "true" # 公開リポジトリなので、予測値・理由をログに出さない（ADR-002）
           METACULUS_TOKEN: ${{ secrets.METACULUS_TOKEN }} # replace this with the name of the variable under which you stored your own Metaculus token
           PERPLEXITY_API_KEY: ${{ secrets.PERPLEXITY_API_KEY }}
           EXA_API_KEY: ${{ secrets.EXA_API_KEY }}

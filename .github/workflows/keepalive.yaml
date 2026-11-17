@@ -1,0 +1,32 @@
+name: Keep scheduled runs alive
+
+# 公開リポジトリでは、60日間リポジトリに動きがないと定時実行が黙って止まる（GitHub の仕様）。
+# 月に1回、docs/keepalive.log に日時を1行足して push し、止まらないようにする（docs/decisions/ADR-002）。
+on:
+  schedule:
+    - cron: "41 3 1 * *" # 毎月1日 03:41 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
+jobs:
+  keepalive:
+    # 本番を止めているあいだ（BOT_ENABLED が true でない）は何もしない
+    if: vars.BOT_ENABLED == 'true' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Append a timestamp and push
+        run: |
+          date -u +"%Y-%m-%dT%H:%M:%SZ" >> docs/keepalive.log
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/keepalive.log
+          git commit -m "keepalive: 定時実行が60日で止まらないよう月1回記録する"
+          git push

@@ -97,6 +97,7 @@ def print_run_summary_banner(
     forecast_reports: Sequence[Any],
     will_publish: bool,
     tournament_url: str | None = None,
+    hide_exception_messages: bool = False,
 ) -> None:
     """
     End-of-run summary printed via print() (not logger) so it survives log
@@ -141,6 +142,10 @@ def print_run_summary_banner(
     if exceptions:
         print()
         for exc in exceptions:
+            if hide_exception_messages:
+                # 公開リポジトリ用: 例外の本文には LLM の出力の断片が入りうる（ADR-002）
+                print(f"  ❌ {type(exc).__name__}")
+                continue
             msg = str(exc)
             if len(msg) > 200:
                 msg = msg[:200] + "..."
@@ -148,3 +153,34 @@ def print_run_summary_banner(
 
     print(banner)
     print()
+
+
+def log_public_summary(forecast_reports: Sequence[Any], bot_name: str) -> int:
+    """
+    公開リポジトリ用の実行要約。予測値・理由・調査内容は出さず、問題の URL、
+    軽い誤りの件数、費用と時間の見積もりだけを出す。失敗した件数を返す。
+
+    forecasting-tools の log_report_summary は理由の全文を出すので、
+    公開リポジトリでは代わりにこれを使う（docs/decisions/ADR-002）。
+    """
+    from forecasting_tools import ForecastReport
+
+    valid = [r for r in forecast_reports if isinstance(r, ForecastReport)]
+    exceptions = [r for r in forecast_reports if isinstance(r, BaseException)]
+
+    print(f"Bot: {bot_name}")
+    for r in valid:
+        print(f"✅ URL: {r.question.page_url} | Minor Errors: {len(r.errors or [])}")
+    for exc in exceptions:
+        # 例外の本文には LLM の出力の断片が入りうるので、種類だけを出す
+        print(f"❌ Exception: {type(exc).__name__}")
+
+    total_cost = sum(r.price_estimate or 0 for r in valid)
+    total_minutes = sum(r.minutes_taken or 0 for r in valid)
+    n = len(valid)
+    print("Stats for passing reports:")
+    print(f"Total cost estimated: ${total_cost:.5f}")
+    print(f"Average cost per question: ${(total_cost / n if n else 0):.5f}")
+    print(f"Average time spent per question: {(total_minutes / n if n else 0):.4f} minutes")
+    print("Note: costs are estimated via litellm; untracked models or tools are not included.")
+    return len(exceptions)

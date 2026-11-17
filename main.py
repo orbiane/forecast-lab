@@ -1,6 +1,7 @@
 import argparse
 import asyncio
 import logging
+import os
 from datetime import datetime, timezone
 from typing import Literal
 
@@ -8,6 +9,7 @@ import dotenv
 
 # Runtime helpers (env validation, banners, dependency-warning suppression).
 from bot_helpers import (
+    log_public_summary,
     check_environment,
     print_run_summary_banner,
     print_startup_banner,
@@ -698,6 +700,12 @@ if __name__ == "__main__":
         help="What to forecast on (default: tournament)",
     )
     args = parser.parse_args()
+
+    # 公開リポジトリでは実行ログが誰でも読める。受付中の予測値・理由・調査内容を
+    # ログに出さないため、このファイルの INFO ログを止める（docs/decisions/ADR-002）
+    hide_forecasts = os.getenv("HIDE_FORECASTS_IN_LOGS", "").strip().lower() == "true"
+    if hide_forecasts:
+        logger.setLevel(logging.WARNING)
     run_mode: Literal["tournament", "metaculus_cup", "test_questions"] = args.mode
 
     check_environment(strict=True)
@@ -775,9 +783,17 @@ if __name__ == "__main__":
             )
         )
 
-    template_bot.log_report_summary(forecast_reports)
+    if hide_forecasts:
+        n_failed = log_public_summary(forecast_reports, type(template_bot).__name__)
+    else:
+        template_bot.log_report_summary(forecast_reports)
+        n_failed = 0
     print_run_summary_banner(
         forecast_reports,
         will_publish=publish_to_metaculus,
         tournament_url=TOURNAMENT_URLS.get(run_mode),
+        hide_exception_messages=hide_forecasts,
     )
+    if n_failed:
+        # 見本の log_report_summary と同じく、失敗があれば実行を失敗扱いにする
+        raise RuntimeError(f"{n_failed} errors occurred while forecasting")

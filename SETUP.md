@@ -42,7 +42,11 @@
 2. 3〜5分で終わる。緑のチェックが付けば成功。赤なら、その実行を開いてログを見るか、Claude にリンクを渡す
 3. 予測が届いたかを見る: Metaculus に人間用アカウントでログイン → 右上の名前 → `Settings` → `My Forecasting Bots` → `Switch to bot account` → 練習用の大会（bot-testing-area）の問題を開く。理由は `Private` のコメント欄にある
 4. 本番を始める: `Settings` → `Secrets and variables` → `Actions` → `Variables` タブ → `New repository variable` で、名前 `BOT_ENABLED`、値 `true`
-5. これで毎時、新しい問題に予測を出す
+5. これで20分おきに、新しい問題に予測を出す
+
+## コミットのメールアドレスを隠す（公開リポジトリなので）
+
+GitHub の右上のアイコン → `Settings` → 左の `Emails` → `Keep my email addresses private` に印を付ける。Mac で Claude Code がコミットするときに、本物のメールアドレスが公開の履歴に残らないようにするため。
 
 ## 止め方
 

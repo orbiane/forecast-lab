@@ -1,4 +1,4 @@
-<!-- このリポジトリは非公開（2026-11 時点）。公開に切り替えるかは持ち主が決める（docs/decisions/ADR-001 の「保留」） -->
+<!-- このリポジトリは公開（ADR-002）。実行ログも誰でも読める。鍵、個人情報、受付中の予測値や理由をコミットやログに出さない -->
 # forecast-lab
 
 Metaculus の AI 予測ボット大会（FutureEval）に出すボットのリポジトリ。人間が途中で手を出さないボットが、未来の出来事に確率をつけて予測し、当たり外れで賞金を競う。
@@ -10,7 +10,9 @@ Metaculus の AI 予測ボット大会（FutureEval）に出すボットのリ�
 ## 仕組み
 
 - 本体は Metaculus 公式の見本ボット（metac-bot-template）。`main.py` が `forecasting-tools` パッケージを使って、問題の取得・調査・予測・投稿をする
-- GitHub Actions が定時に `main.py` を動かす（`.github/workflows/run_bot_on_tournament.yaml`）。シーズン大会と MiniBench の両方に予測を出す
+- GitHub Actions が20分おきに `main.py` を動かす（`.github/workflows/run_bot_on_tournament.yaml`）。シーズン大会と MiniBench の両方に予測を出す
+- 公開リポジトリなので、`HIDE_FORECASTS_IN_LOGS=true` で調査内容・理由・予測値をログに出さない（ADR-002）
+- `.github/workflows/keepalive.yaml` が月1回 `docs/keepalive.log` に1行足して `main` に push する（60日ルール対策。持ち主承認済みの例外）
 - 鍵（`METACULUS_TOKEN`、`OPENROUTER_API_KEY` など）は GitHub の Secrets に置く
 - 安全スイッチ: リポジトリ変数 `BOT_ENABLED` が `true` のときだけ定時実行する。止めるときは `false` にする
 
@@ -24,15 +26,17 @@ Metaculus の AI 予測ボット大会（FutureEval）に出すボットのリ�
 
 1. **人間が途中で手を出さない。** 大会の基本ルール。予測を手で直す仕組み、特定の問題に人が答えを入れる仕組みを作らない。破ると失格になる
 2. **コメントはボットの実際の推論と最終判断を書く。** 賞金の条件。後から体裁を整えた理由や、作り話の理由を載せない
-3. **鍵をコミットしない。** `.env` は `.gitignore` 済み。ログや報告書にも鍵を書かない
+3. **鍵をコミットしない。** `.env` は `.gitignore` 済み。ログや報告書にも鍵を書かない。公開リポジトリなので、コミットされた鍵はすぐに漏れたものとして扱い、作り直す
 4. **大会に出すボットは1人1体。** 別のボットアカウントで同じ大会に出さない（賞金対象は1人1体）
 5. **費用が増える変更は持ち主の承認後。** 高いモデルへの切り替え、予測や調査の回数の増加、実行頻度の引き上げ
 6. **本番の予測を変える変更は、作業ブランチで作り、Test Bot（bot-testing-area）で動作を示してから `main` に入れる**
+7. **受付中の予測値・理由・調査内容をログに出さない。** 公開リポジトリのログは誰でも読め、Metaculus は受付中の予測を隠している。ログを増やす変更をしたら、Test Bot のログで漏れていないことを示す
 
 ## 環境の落とし穴
 
 - GitHub Actions の cron は UTC。定時実行は既定ブランチ（`main`）のワークフローしか動かない。混雑時は遅れることがある
-- 非公開リポジトリの Actions は、無料プランで月2,000分まで（持ち主の他の非公開リポジトリと合算）。実行1回は分単位で切り上げて数えられる。頻度を上げる前に計算する
+- 公開リポジトリの Actions は無料で無制限。ただし60日間リポジトリに動きがないと、定時実行が黙って止まる（keepalive で対策）
+- 大会の問題は、受付が1〜1.5時間しかないことがある。実行頻度を下げる前に、問題を逃さないか確かめる
 - 大会は季節で切り替わる。`main.py` は `forecasting-tools` の定数（`CURRENT_AI_COMPETITION_ID`、`CURRENT_MINIBENCH_ID`）で今の大会を選ぶので、シーズンの変わり目はパッケージの更新が要ることがある
 - `pyproject.toml` は `exclude-newer = "7 days"`（公開から7日未満のパッケージを入れない）。`forecasting-tools` だけ例外
 - このリポジトリの作業環境（クラウドの Claude）からは metaculus.com に直接つながらない。Metaculus への接続を伴う確認は GitHub Actions の実行で行う
