@@ -43,6 +43,8 @@
 | シーズン大会の参加者は LLM の利用料が無料（OpenAI・Anthropic・Google の提供） | 公式 | futureeval/participate |
 | ただし今季は配り方が厳しい。最初は約100ドル分、追加は MiniBench の成績しだい。オープンソースのボットは約2倍 | 観察（要約経由） | 秋2026告知（上の公式の記述と食い違う。告知の方が新しい） |
 | クレジットが通ったときの OpenRouter キーの受け取り方 | 要確認 | 通知メールを見る |
+| 秋2026シーズンのクレジット申請は締め切り済み。次のシーズンの数週間前に再開予定 | 公式 | 参加フォームの表示（2026-11-17） |
+| クレジットは審査制で、一部の作者にだけ配られる。シーズンごとに申請し直す | 観察（要約経由） | Metaculus「AI Benchmark Resources」 |
 | 見本ボットの既定のモデル（`OPENROUTER_API_KEY` のみの場合）: 予測は `openrouter/anthropic/claude-opus-5.5`、要約と読み取りは `claude-haiku-5.5`、調査は `openrouter/perplexity/sonar-pro` | 生データで確認 | forecasting-tools 0.3.7 の `forecast_bot.py` `_llm_config_defaults` |
 | `uv.lock` が固定しているのは forecasting-tools 0.3.5。0.3.5 の既定が上と同じか | 要確認 | 最初の実行のログで、使ったモデル名を見る |
 | 見本ボットの設定: 1問につき調査1回、予測5回 | 生データで確認 | `main.py` の `FallTemplateBot2026(...)` |
